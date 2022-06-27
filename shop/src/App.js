@@ -1,5 +1,5 @@
 import './App.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
@@ -8,12 +8,29 @@ import { Routes, Route, Link, useNavigate, Outlet } from "react-router-dom";
 import Detail from './routes/Detail.js';
 import axios from 'axios';
 import Cart from './routes/Cart.js';
+import { useQuery } from "react-query";
 
 
 function App() {
 
+  // let obj = {name : 'kim'};
+  // localStorage.setItem('data', JSON.stringify(obj));
+  // let 꺼낸거 = localStorage.getItem('data');
+  // console.log(JSON.parse(꺼낸거));
+
+  useEffect(()=>{
+    localStorage.setItem('watched', JSON.stringify([]))
+  }, [])
+
   let [shoes, setShoes] = useState(data);
   let navigate = useNavigate();
+
+  // 서버에서 유저이름 가져와서 보여주기
+  let result = useQuery('작명', ()=>
+    axios.get('https://codingapple1.github.io/userdata.json').then((a)=>{
+      return a.data
+    })
+  )
 
   return (
 
@@ -29,6 +46,11 @@ function App() {
             <Nav.Link onClick={()=>{navigate('/detail')}}>Detail</Nav.Link>
             <Nav.Link onClick={()=>{navigate('/cart')}}>Cart</Nav.Link>
           </Nav>
+            <Nav className="ms-auto" style={{color:"white"}}>
+              { result.isLoading && '로딩중' }
+              { result.error && '에러남'}
+              { result.data && result.data.name }
+            </Nav>
         </Container>
       </Navbar>
 
